@@ -17,22 +17,21 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect(err => {
   // console.log("connection err" , err);
   const ProduictCollection = client.db("Product_Docs").collection("Products");
+  const orderCollection = client.db("taobaoStore").collection("order");
   
   // adding product by uploading
   app.post('/addProducts', (req, res) => {
     const newProducts = req.body;
-    console.log('adding new event: ', newProducts)
     ProduictCollection.insertOne(newProducts)
       .then(result => {
-        console.log('inserted count', result.insertedCount);
-        res.send(result.insertedCount > 0)
+        // res.send(result.insertedCount > 0)
+        res.redirect('/')
       })
   })
 
   app.get('/products' , (req ,res ) => {
       ProduictCollection.find()
       .toArray((err , docs) =>{
-        console.log(docs);
         res.send(docs)
       })
   })
@@ -48,8 +47,27 @@ client.connect(err => {
     const id = ObjectID(req.params.id)
     ProduictCollection.findOneAndDelete({_id: id})
     .then(docs => {
-      console.log(docs);
-      res.send(docs)
+      // console.log(docs);
+      res.redirect('/')
+      
+    })
+  })
+  app.post('/addOrder' , (req, res)=>{
+    const order = req.body;
+    orderCollection.insertOne(order)
+    .then(result =>{
+      res.send(result.insertedCount> 0)
+      console.log(result);
+    })
+  })
+
+  app.get('/orders' , (req , res)=> {
+    const  query = req.query.email;
+    console.log(query);
+    orderCollection.find()
+    .toArray((err , doc) =>{
+      // console.log(doc);
+      res.send(doc)
     })
   })
 });
