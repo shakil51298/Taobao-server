@@ -63,8 +63,8 @@ client.connect(err => {
 
   app.get('/orders' , (req , res)=> {
     const  query = req.query.email;
-    console.log(query);
-    orderCollection.find()
+    // console.log(query);
+    orderCollection.find({email : query})
     .toArray((err , doc) =>{
       // console.log(doc);
       res.send(doc)
